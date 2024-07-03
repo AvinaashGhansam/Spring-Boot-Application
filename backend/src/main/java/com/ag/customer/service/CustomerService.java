@@ -14,25 +14,48 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Business Logic
- * The service gets its data from the CustomerDao
+ * The {@code CustomerService} class provides business logic for managing customers.
+ * It interacts with the {@link CustomerDao} to perform CRUD operations.
  */
 @Service
 public class CustomerService {
     private final CustomerDao customerDao;
 
+    /**
+     * Constructs a new {@code CustomerService} with the specified {@link CustomerDao}.
+     *
+     * @param customerDao the {@link CustomerDao} to be used for data access operations
+     */
     public CustomerService(/*@Qualifier("jpa")*/ @Qualifier("jdbc") CustomerDao customerDao/*, CustomerRepository customerRepository*/) {
         this.customerDao = customerDao;
     }
 
+    /**
+     * Retrieves all customers from the database.
+     *
+     * @return a list of all customers
+     */
     public List<Customer> getAllCustomers() {
         return customerDao.selectAllCustomers();
     }
 
+    /**
+     * Retrieves a customer by their ID.
+     *
+     * @param id the ID of the customer to retrieve
+     * @return the {@link Customer} with the specified ID
+     * @throws ResourceNotFoundException if no customer with the specified ID is found
+     */
     public Customer getCustomerById(Integer id) {
         return customerDao.selectCustomerById(id).orElseThrow(() -> new ResourceNotFoundException("customer with id[%s] not found".formatted(id)));
     }
 
+    /**
+     * Adds a new customer to the database.
+     *
+     * @param customerRegistrationRequest the request containing customer registration details
+     * @throws DuplicateResourceException if a customer with the specified email already exists
+     */
     public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
         // If the email exist, throw an exception
         if (customerDao.existsPersonWithEmail(customerRegistrationRequest.email())) {
@@ -42,6 +65,12 @@ public class CustomerService {
         customerDao.insertCustomer(new Customer(customerRegistrationRequest.name(), customerRegistrationRequest.email(), customerRegistrationRequest.age()));
     }
 
+    /**
+     * Deletes a customer by their ID.
+     *
+     * @param id the ID of the customer to delete
+     * @throws ResourceNotFoundException if no customer with the specified ID is found
+     */
     public void deleteCustomerById(Integer id) {
         // Check if customer exist
        if (!customerDao.existsPersonById(id)) {
@@ -51,6 +80,14 @@ public class CustomerService {
        customerDao.deleteCustomerById(id);
     }
 
+    /**
+     * Updates customer information.
+     *
+     * @param id the ID of the customer to update
+     * @param customerUpdateRequest the request containing updated customer details
+     * @throws DuplicateResourceException if a customer with the specified email already exists
+     * @throws RequestValidationException if no data changes are found
+     */
     public void updateCustomer(Integer id, CustomerUpdateRequest customerUpdateRequest) {
         Customer customer = getCustomerById(id);
 

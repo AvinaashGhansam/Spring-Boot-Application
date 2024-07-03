@@ -8,17 +8,28 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * The {@link CustomerJDBCDataAccessService} class implements the {@link CustomerDao} interface to provide data access operations for {@link Customer} objects using JDBC.
+ */
 @Repository("jdbc")
 public class CustomerJDBCDataAccessService implements CustomerDao {
     private final JdbcTemplate jdbcTemplate;
     private final CustomerRowMapper customerRowMapper;
 
+    /**
+     * Constructs a new {@link CustomerJDBCDataAccessService} with the specified {@link JdbcTemplate} and {@link CustomerRowMapper}.
+     *
+     * @param jdbcTemplate the {@link JdbcTemplate} to be used for data access operations
+     * @param customerRowMapper the {@link CustomerRowMapper} to be used for mapping {@link Customer} objects
+     */
     public CustomerJDBCDataAccessService(JdbcTemplate jdbcTemplate, CustomerRowMapper customerRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.customerRowMapper = customerRowMapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Customer> selectAllCustomers() {
         String sql = """
@@ -27,6 +38,9 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
         return jdbcTemplate.query(sql, customerRowMapper);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Customer> selectCustomerById(Integer id) {
         String sql = """
@@ -35,6 +49,9 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
         return jdbcTemplate.query(sql, customerRowMapper, id).stream().findFirst();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void insertCustomer(Customer customer) {
         String sql = """
@@ -44,6 +61,9 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
         jdbcTemplate.update(sql, customer.getName(), customer.getEmail(), customer.getAge());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean existsPersonWithEmail(String email) {
         String sql = """
@@ -53,6 +73,9 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
         return count != null && count > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteCustomerById(Integer id) {
         String sql = """
@@ -61,6 +84,9 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
         jdbcTemplate.update(sql, id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean existsPersonById(Integer id) {
         // TODO: Fix Method Name, not consistent
@@ -71,6 +97,9 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
         return count != null && count > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateCustomer(Customer updatedCustomer) {
         if (updatedCustomer.getName() != null) {
